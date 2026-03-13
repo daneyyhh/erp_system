@@ -2,7 +2,9 @@
 // PROJECT ERP - ULTRA-ROBUST CLOUD ENGINE
 // This file is designed to find a database connection regardless of the environment.
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 /**
  * Smart variable lookup: Checks getenv, $_ENV, $_SERVER, and common aliases
