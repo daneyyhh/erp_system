@@ -2,11 +2,11 @@
 // PROJECT ERP - VERCEL CLOUD ENGINE
 // This configuration is optimized for Vercel Serverless Functions
 
-$host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost'); 
-$port = getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? '3306'); 
-$db   = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'smart_college_erp');
-$user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
-$pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
+$host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? ($_SERVER['DB_HOST'] ?? 'localhost')); 
+$port = getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? ($_SERVER['DB_PORT'] ?? '3306')); 
+$db   = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? ($_SERVER['DB_NAME'] ?? 'smart_college_erp'));
+$user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? ($_SERVER['DB_USER'] ?? 'root'));
+$pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? ($_SERVER['DB_PASS'] ?? ''));
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
@@ -26,11 +26,11 @@ try {
             <p>Database connection failed. Please check your <strong>Vercel Environment Variables</strong>.</p>
             <div style='background:#fef2f2; padding:20px; border-radius:15px; margin:20px auto; max-width:500px;'>
                 <ul style='text-align:left;'>
-                    <li>DB_HOST</li>
-                    <li>DB_PORT</li>
-                    <li>DB_NAME</li>
-                    <li>DB_USER</li>
-                    <li>DB_PASS</li>
+                    <li>DB_HOST: " . (getenv('DB_HOST') ? "✅ Found" : "❌ Missing") . "</li>
+                    <li>DB_PORT: " . (getenv('DB_PORT') ? "✅ Found" : "❌ Missing") . "</li>
+                    <li>DB_NAME: " . (getenv('DB_NAME') ? "✅ Found" : "❌ Missing") . "</li>
+                    <li>DB_USER: " . (getenv('DB_USER') ? "✅ Found" : "❌ Missing") . "</li>
+                    <li>DB_PASS: " . (getenv('DB_PASS') ? "✅ Found" : "❌ Missing") . "</li>
                 </ul>
             </div>
             <p style='color:gray; font-size:12px;'>Error: " . $e->getMessage() . "</p>
