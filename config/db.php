@@ -1,16 +1,56 @@
 <?php
-// PROJECT ERP - VERCEL CLOUD ENGINE
-// This configuration is optimized for Vercel Serverless Functions
+// PROJECT ERP - ULTRA-ROBUST CLOUD ENGINE
+// This file is designed to find a database connection regardless of the environment.
 
-$host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? ($_SERVER['DB_HOST'] ?? 'localhost')); 
-$port = getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? ($_SERVER['DB_PORT'] ?? '3306')); 
-$db   = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? ($_SERVER['DB_NAME'] ?? 'smart_college_erp'));
-$user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? ($_SERVER['DB_USER'] ?? 'root'));
-$pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? ($_SERVER['DB_PASS'] ?? ''));
+session_start();
+
+/**
+ * Smart variable lookup: Checks getenv, $_ENV, $_SERVER, and common aliases
+ */
+function get_db_var($key, $default) {
+    // 1. Check Session (from the Web Setup Wizard)
+    if (isset($_SESSION['DB_CREDS'][$key])) return $_SESSION['DB_CREDS'][$key];
+
+    // 2. Check common aliases (Vercel/others use different naming)
+    $aliases = [
+        'DB_HOST' => ['DB_HOST', 'MYSQL_HOST', 'MYSQLHOST', 'DATABASE_URL'],
+        'DB_PORT' => ['DB_PORT', 'MYSQL_PORT', 'MYSQLPORT'],
+        'DB_NAME' => ['DB_NAME', 'MYSQL_DATABASE', 'MYSQLDATABASE', 'DB_DATABASE'],
+        'DB_USER' => ['DB_USER', 'MYSQL_USER', 'MYSQLUSER', 'DB_USERNAME'],
+        'DB_PASS' => ['DB_PASS', 'MYSQL_PASSWORD', 'MYSQLPASSWORD', 'DB_PASSWORD']
+    ];
+
+    $search_keys = $aliases[$key] ?? [$key];
+    foreach ($search_keys as $k) {
+        $val = getenv($k) ?: ($_ENV[$k] ?? ($_SERVER[$k] ?? null));
+        if ($val) return ($key === 'DB_HOST' && strpos($val, 'mysql://') === 0) ? parse_url($val, PHP_URL_HOST) : $val;
+    }
+
+    return $default;
+}
+
+// Map the variables
+$host = get_db_var('DB_HOST', 'localhost');
+$port = get_db_var('DB_PORT', '3306');
+$db   = get_db_var('DB_NAME', 'smart_college_erp');
+$user = get_db_var('DB_USER', 'root');
+$pass = get_db_var('DB_PASS', '');
 $charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
+// Handle Manual Setup Submission
+if (isset($_POST['setup_db'])) {
+    $_SESSION['DB_CREDS'] = [
+        'DB_HOST' => $_POST['m_host'],
+        'DB_PORT' => $_POST['m_port'],
+        'DB_NAME' => $_POST['m_db'],
+        'DB_USER' => $_POST['m_user'],
+        'DB_PASS' => $_POST['m_pass']
+    ];
+    header("Location: " . $_SERVER['REQUEST_URI']);
+    exit;
+}
 
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -19,25 +59,64 @@ $options = [
 ];
 
 try {
-     $pdo = new PDO($dsn, $user, $pass, $options);
+    $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-     $env_status = "";
-     $vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS'];
-     foreach($vars as $v) {
-         $found = getenv($v) ?: ($_ENV[$v] ?? ($_SERVER[$v] ?? false));
-         $env_status .= "<li>$v: " . ($found ? "✅ Found" : "❌ Missing") . "</li>";
-     }
+    // DIAGNOSTIC CHECKLIST
+    $env_report = "";
+    $required = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS'];
+    foreach($required as $r) {
+        $check = get_db_var($r, null);
+        $status = ($check && $check !== 'localhost' && $check !== 'root') ? "✅ Found" : "❌ Missing";
+        $env_report .= "<div style='display:flex; justify-content:space-between; margin-bottom:8px;'>
+                            <span style='font-weight:bold;'>$r</span>
+                            <span style='color:".($status === "✅ Found" ? "#059669" : "#dc2626")."'>$status</span>
+                        </div>";
+    }
 
-     die("<div style='font-family:sans-serif; padding:40px; text-align:center;'>
-            <h2 style='color:#b91c1c;'>⛔ Global ERP Offline</h2>
-            <p>Database connection failed. Please check your <strong>Vercel Environment Variables</strong>.</p>
-            <div style='background:#fef2f2; padding:20px; border-radius:15px; margin:20px auto; max-width:500px;'>
-                <ul style='text-align:left;'>
-                    $env_status
-                </ul>
+    die("
+    <!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>Connection Required | Enlight ERP</title>
+        <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
+        <style>
+            :root { --primary: #6366f1; --bg: #f8fafc; }
+            body { background: var(--bg); font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+            .setup-card { background: white; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 100%; max-width: 500px; padding: 40px; }
+            .status-box { background: #f1f5f9; border-radius: 16px; padding: 20px; margin-bottom: 25px; font-size: 14px; }
+            .btn-primary { background: var(--primary); border: none; padding: 12px; border-radius: 12px; font-weight: 600; }
+        </style>
+    </head>
+    <body>
+        <div class='setup-card animate-up'>
+            <div class='text-center mb-4'>
+                <div style='background: #fee2e2; width: 60px; height: 60px; line-height: 60px; border-radius: 50%; display: inline-block; margin-bottom: 20px;'>
+                    <span style='font-size: 24px;'>🔌</span>
+                </div>
+                <h3 class='fw-bold'>Cloud Connection Required</h3>
+                <p class='text-muted small'>We couldn't detect your database credentials automatically.</p>
             </div>
-            <p style='color:gray; font-size:12px;'>Error: " . $e->getMessage() . "</p>
-            <p style='color:silver; font-size:10px;'>Connected to: " . htmlspecialchars($host) . " on port " . htmlspecialchars($port) . "</p>
-          </div>");
+
+            <div class='status-box'>
+                $env_report
+            </div>
+
+            <form method='POST' action=''>
+                <div class='row g-2 mb-2'>
+                    <div class='col-8'><input type='text' name='m_host' class='form-control small' placeholder='Database Host (e.g. mysql-xx.aiven.com)' required></div>
+                    <div class='col-4'><input type='text' name='m_port' class='form-control small' placeholder='Port' value='24564'></div>
+                </div>
+                <input type='text' name='m_db' class='form-control mb-2' placeholder='Database Name' value='defaultdb'>
+                <input type='text' name='m_user' class='form-control mb-2' placeholder='User (e.g. avnadmin)'>
+                <input type='password' name='m_pass' class='form-control mb-4' placeholder='Database Password'>
+                
+                <button type='submit' name='setup_db' class='btn btn-primary w-100 mb-3'>Connect & Save to Session</button>
+            </form>
+            
+            <p class='text-center smallest text-muted'>Error: " . $e->getMessage() . "</p>
+        </div>
+    </body>
+    </html>");
 }
-?>
