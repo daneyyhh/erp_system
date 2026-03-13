@@ -1,12 +1,12 @@
 # 🚀 Hosting your Enlight ERP on Vercel
 
-Since you've configured your **Aiven Cloud Database**, you can now host the entire application for free on Vercel.
+Since you've configured your **Cloud Database**, you can now host the entire application for free on Vercel.
 
-## 🛠️ Step 1: Pre-Flight Check in Aiven
+## 🛠️ Step 1: Pre-Flight Check
 Before deploying, you **MUST** allow Vercel's servers to talk to your database:
-1.  Go to your **Aiven Console** -> **MySQL** -> **Overview**.
-2.  Find **Allowed IP Addresses**.
-3.  Click **Add IP Address** and enter `0.0.0.0/0`.
+1.  Go to your **Cloud Database Console** (e.g., TiDB, Supabase, etc.).
+2.  Find the **Security / Firewall / Allowed IP Addresses** section.
+3.  Add `0.0.0.0/0` to allow Vercel's dynamic IP addresses.
     *   *Why?* Vercel uses dynamic IP addresses that change constantly. This setting allows the Vercel-hosted app to always find your database.
 
 ## 📦 Step 2: Deploy using Vercel CLI

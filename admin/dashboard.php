@@ -124,7 +124,7 @@ $kpis = [
                             </div>
 
                             <div class="bg-light p-4 rounded-4 mt-5">
-                                <p class="smallest text-muted fw-bold mb-0 text-center"><i class="fas fa-shield-check me-2"></i> System Secured via Aiven & Vercel</p>
+                                <p class="smallest text-muted fw-bold mb-0 text-center"><i class="fas fa-shield-check me-2"></i> System Secured via Cloud Security</p>
                             </div>
                         </div>
                     </div>
