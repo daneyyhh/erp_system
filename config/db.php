@@ -21,18 +21,19 @@ $options = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
+     $env_status = "";
+     $vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS'];
+     foreach($vars as $v) {
+         $found = getenv($v) ?: ($_ENV[$v] ?? ($_SERVER[$v] ?? false));
+         $env_status .= "<li>$v: " . ($found ? "✅ Found" : "❌ Missing") . "</li>";
+     }
+
      die("<div style='font-family:sans-serif; padding:40px; text-align:center;'>
             <h2 style='color:#b91c1c;'>⛔ Global ERP Offline</h2>
             <p>Database connection failed. Please check your <strong>Vercel Environment Variables</strong>.</p>
             <div style='background:#fef2f2; padding:20px; border-radius:15px; margin:20px auto; max-width:500px;'>
                 <ul style='text-align:left;'>
-                    <?php
-                    $vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS'];
-                    foreach($vars as $v) {
-                        $found = getenv($v) ?: ($_ENV[$v] ?? ($_SERVER[$v] ?? false));
-                        echo "<li>$v: " . ($found ? "✅ Found" : "❌ Missing") . "</li>";
-                    }
-                    ?>
+                    $env_status
                 </ul>
             </div>
             <p style='color:gray; font-size:12px;'>Error: " . $e->getMessage() . "</p>
