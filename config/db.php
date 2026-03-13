@@ -2,11 +2,11 @@
 // PROJECT ERP - VERCEL CLOUD ENGINE
 // This configuration is optimized for Vercel Serverless Functions
 
-$host = getenv('DB_HOST') ?: 'localhost'; 
-$port = getenv('DB_PORT') ?: '3306'; 
-$db   = getenv('DB_NAME') ?: 'smart_college_erp';
-$user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+$host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost'); 
+$port = getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? '3306'); 
+$db   = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'smart_college_erp');
+$user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
+$pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
@@ -34,6 +34,7 @@ try {
                 </ul>
             </div>
             <p style='color:gray; font-size:12px;'>Error: " . $e->getMessage() . "</p>
+            <p style='color:silver; font-size:10px;'>Connected to: " . htmlspecialchars($host) . " on port " . htmlspecialchars($port) . "</p>
           </div>");
 }
 ?>
