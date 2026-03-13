@@ -26,11 +26,13 @@ try {
             <p>Database connection failed. Please check your <strong>Vercel Environment Variables</strong>.</p>
             <div style='background:#fef2f2; padding:20px; border-radius:15px; margin:20px auto; max-width:500px;'>
                 <ul style='text-align:left;'>
-                    <li>DB_HOST: " . (getenv('DB_HOST') ? "✅ Found" : "❌ Missing") . "</li>
-                    <li>DB_PORT: " . (getenv('DB_PORT') ? "✅ Found" : "❌ Missing") . "</li>
-                    <li>DB_NAME: " . (getenv('DB_NAME') ? "✅ Found" : "❌ Missing") . "</li>
-                    <li>DB_USER: " . (getenv('DB_USER') ? "✅ Found" : "❌ Missing") . "</li>
-                    <li>DB_PASS: " . (getenv('DB_PASS') ? "✅ Found" : "❌ Missing") . "</li>
+                    <?php
+                    $vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS'];
+                    foreach($vars as $v) {
+                        $found = getenv($v) ?: ($_ENV[$v] ?? ($_SERVER[$v] ?? false));
+                        echo "<li>$v: " . ($found ? "✅ Found" : "❌ Missing") . "</li>";
+                    }
+                    ?>
                 </ul>
             </div>
             <p style='color:gray; font-size:12px;'>Error: " . $e->getMessage() . "</p>
