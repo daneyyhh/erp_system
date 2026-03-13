@@ -1,0 +1,15 @@
+# Local Environment
+.DS_Store
+Thumbs.db
+node_modules/
+.env
+
+# XAMPP/Local Logs
+logs/
+*.log
+
+# Vercel
+.vercel
+
+# Database Config Fallbacks
+/config/ca.pem
