@@ -1,13 +1,13 @@
 <?php
-// PROJECT ERP - SMART CLOUD ENGINE
-// Optimized for Aiven & Vercel deployment
+// PROJECT ERP - CLOUD DATABASE ENGINE
+// Optimized for Vercel deployment
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 /**
- * Robust variable lookup: Prioritizes actual cloud hostnames over local defaults.
+ * Robust variable lookup: Searches for database credentials in environment variables and common aliases.
  */
 function get_db_var($key, $default) {
     $aliases = [
@@ -19,21 +19,14 @@ function get_db_var($key, $default) {
     ];
 
     $search_keys = $aliases[$key] ?? [$key];
-    $candidates = [];
 
     foreach ($search_keys as $k) {
         $val = getenv($k) ?: ($_ENV[$k] ?? ($_SERVER[$k] ?? null));
         if ($val) {
-            // ULTIMATE PRIORITY: If we find the Aiven hostname, use it immediately
-            if ($key === 'DB_HOST' && strpos($val, 'aivencloud.com') !== false) return $val;
-            $candidates[] = $val;
+            // Ignore generic defaults like 'mysql' or 'localhost' if we are looking for a cloud host
+            if ($key === 'DB_HOST' && ($val === 'mysql' || $val === 'localhost')) continue;
+            return $val;
         }
-    }
-
-    // Secondary Check: Return the first value that isn't 'mysql' or 'localhost'
-    foreach ($candidates as $c) {
-        if ($key === 'DB_HOST' && ($c === 'mysql' || $c === 'localhost')) continue;
-        return $c;
     }
 
     return $default;
@@ -89,7 +82,7 @@ try {
                 $env_report
             </div>
             <div class='alert alert-warning small'>
-                <b>Action Required:</b> Go to Vercel Settings -> Environment Variables and ensure your Aiven details are added correctly.
+                <b>Action Required:</b> Go to Vercel Settings -> Environment Variables and ensure your database details are added correctly.
             </div>
             <p style='font-size: 10px; color: gray; text-align:center;'>Error: ".htmlspecialchars($e->getMessage())."</p>
         </div>
