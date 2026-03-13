@@ -1,14 +1,15 @@
 {
   "functions": {
-    "api/*.php": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.7.1"
+    },
+    "api/ping.php": {
       "runtime": "vercel-php@0.7.1"
     }
   },
   "routes": [
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
-    { "src": "/api/ping", "dest": "/api/ping.php" },
-    { "src": "/$", "dest": "/login.php" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }
