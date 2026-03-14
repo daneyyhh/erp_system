@@ -1,17 +1,17 @@
 <?php
 $current_role = $_SESSION['user_role'] ?? 'student';
 ?>
-<div class="sidebar">
+<div class="sidebar" style="border-right: 2px solid #ede9fe; padding: 2.5rem 1.5rem;">
     <div class="brand-area mb-5 px-3">
         <div class="d-flex align-items-center gap-3">
-            <div class="bg-primary p-2 rounded-3 text-white">
-                <i class="fas fa-graduation-cap fs-4"></i>
+            <div class="p-2 rounded-4 text-white d-flex align-items-center justify-content-center" style="background: #8e24aa; width: 45px; height: 45px; box-shadow: 0 5px 15px rgba(142,36,170,0.3);">
+                <i class="fas fa-heart fs-4"></i>
             </div>
-            <span class="fw-800 fs-4 text-dark mb-0">Project ERP</span>
+            <span class="fw-800 fs-4 mb-0" style="color: #1e1b4b; letter-spacing: -0.5px;">PurpleHeart</span>
         </div>
     </div>
 
-    <div class="nav-links flex-grow-1 overflow-auto">
+    <div class="nav-links flex-grow-1 overflow-auto" style="scrollbar-width: none;">
         <!-- GLOBAL -->
         <span class="nav-group-label">General</span>
         <a href="../<?php echo $current_role; ?>/dashboard.php" class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'dashboard.php') !== false ? 'active' : ''; ?>">
@@ -103,7 +103,7 @@ $current_role = $_SESSION['user_role'] ?? 'student';
         <?php endif; ?>
 
         <span class="nav-group-label">Preferences</span>
-        <a href="../student/settings.php" class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'settings.php') !== false ? 'active' : ''; ?>">
+        <a href="../<?php echo $current_role; ?>/settings.php" class="nav-link <?php echo strpos($_SERVER['PHP_SELF'], 'settings.php') !== false ? 'active' : ''; ?>">
             <i class="fas fa-gear"></i> Settings
         </a>
     </div>

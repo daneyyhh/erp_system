@@ -28,7 +28,17 @@ $page_title = "Ward Progress Report | Scholarly";
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            #printableArea, #printableArea * { visibility: visible; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 100%; border: none !important; box-shadow: none !important; }
+            .print-only { display: block !important; }
+            .no-print { display: none !important; }
+        }
+        .print-only { display: none; }
+    </style>
 </head>
 <body style="background: #f8fafc;">
     <div class="wrapper">
@@ -51,7 +61,11 @@ $page_title = "Ward Progress Report | Scholarly";
                     </button>
                 </div>
 
-                <div class="card border-0 shadow-sm p-5" style="border-radius: 30px;">
+                <div id="printableArea" class="card border-0 shadow-sm p-5" style="border-radius: 30px;">
+                    <div class="print-only mb-5 text-center">
+                        <h1 class="fw-800">OFFICIAL ACADEMIC TRANSCRIPT</h1>
+                        <p class="text-muted">Student: <b><?php echo $ward['name']; ?></b></p>
+                    </div>
                     <div class="table-responsive">
                         <table class="table">
                             <thead>

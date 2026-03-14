@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS subjects;
 DROP TABLE IF EXISTS teachers;
 DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS logs;
 
 CREATE DATABASE IF NOT EXISTS smart_college_erp;
 USE smart_college_erp;

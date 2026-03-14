@@ -31,7 +31,7 @@ $certs = $pdo->query("SELECT c.*, u.name as student_name, s.roll_no, s.class
                       JOIN students s ON c.student_id = s.id 
                       JOIN users u ON s.user_id = u.id 
                       WHERE c.status IN ('teacher_approved', 'approved') 
-                      ORDER BY c.status ASC, c.request_date DESC")->fetchAll();
+                      ORDER BY c.status ASC, c.applied_date DESC")->fetchAll();
 
 $page_title = "Certificate Bureau | Scholarly";
 ?>
@@ -42,7 +42,7 @@ $page_title = "Certificate Bureau | Scholarly";
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
 </head>
 <body style="background: #f8fafc;">
     <div class="wrapper">

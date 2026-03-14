@@ -40,12 +40,9 @@ A modern, web-based College Management System designed to digitize administrativ
 - `/assets`: CSS, JS, and high-fidelity themes.
 - `/config`: Cloud-ready DB connections.
 
-## ☁️ Cloud Deployment (Vercel)
-This project is optimized for **Vercel**. To host it globally:
-1. **GitHub**: Push your code to a new repository.
-2. **Import**: Select the repo in Vercel.
-3. **Configure**: Add your database credentials as Vercel Environment Variables.
-4. **Init**: Run `cloud_init.php` to set up your tables.
+## ☁️ Local Setup Script
+For a one-click database setup after installation, simply navigate to:
+`http://localhost/ERP_SYSTEM/setup.php`
 
 ---
-*Created with High-Fidelity Engineering for Enlight ERP.*
+*Created with High-Fidelity Engineering for Project ERP.*

@@ -1,17 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Day Mode - Refined High Contrast */
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-soft: #f5f3ff;
-    --bg-page: #f8fafc;
+    /* Day Mode - Refined High Contrast PurpleHeart Theme */
+    --primary: #8e24aa; /* Deep Purple */
+    --primary-hover: #6a1b9a;
+    --primary-soft: #f3e5f5; /* Light purple tint */
+    --bg-page: #fdfcff;
     --bg-card: #ffffff;
     --bg-sidebar: #ffffff;
-    --text-main: #0f172a;
-    --text-body: #475569;
-    --text-muted: #64748b;
-    --border: #f1f5f9;
+    --text-main: #1e1b4b; /* Deep intense navy purple */
+    --text-body: #4c1d95; /* Indigoish purple */
+    --text-muted: #8b5cf6;
+    --border: #ede9fe;
     --input-bg: #ffffff;
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.5);

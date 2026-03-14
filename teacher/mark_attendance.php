@@ -63,7 +63,7 @@ $page_title = "Attendance Portal | Scholarly";
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
     <style>
         .attendance-v2-container { display: flex; gap: 30px; }
         .attendance-sidebar { width: 320px; flex-shrink: 0; }
@@ -220,7 +220,7 @@ $page_title = "Attendance Portal | Scholarly";
 
                     <!-- MAIN ATTENDANCE AREA -->
                     <div class="attendance-main">
-                        <form method="POST">
+                        <form method="POST" action="?class=<?php echo urlencode($class); ?>&subject_id=<?php echo $subject_id; ?>&date=<?php echo $selected_date; ?>">
                             <div class="card border-0 shadow-sm p-5" style="border-radius: 30px;">
                                 <div class="d-flex justify-content-between align-items-start mb-5">
                                     <div>

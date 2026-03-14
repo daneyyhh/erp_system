@@ -19,10 +19,10 @@ $notif_count = $notif_count_stmt->fetchColumn();
     })();
 </script>
 
-<div class="top-header" style="padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; position: relative;">
+<div class="top-header" style="padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; position: relative; background: #fff; border-bottom: 1px solid #ede9fe; margin-bottom: 2rem; border-radius: 0 0 32px 32px; box-shadow: 0 10px 40px rgba(142,36,170,0.03);">
     <div class="animate-up">
-        <h2 class="fw-800 mb-1" style="letter-spacing: -2px; font-size: 2.2rem;">Hello, <?php echo explode(' ', $user_name)[0]; ?>! 👋</h2>
-        <p class="text-muted smallest mb-0 fw-800 uppercase ls-2">Project ERP Core • <?php echo strtoupper($role); ?></p>
+        <h2 class="fw-800 mb-1" style="letter-spacing: -2px; font-size: 2.2rem; color: #1e1b4b;">Hello, <?php echo explode(' ', $user_name)[0]; ?>! 👋</h2>
+        <p class="text-muted smallest mb-0 fw-800 uppercase ls-2" style="color: #8b5cf6 !important;">PurpleHeart Portal • <?php echo strtoupper($role); ?></p>
     </div>
     
     <div class="d-flex align-items-center gap-4">

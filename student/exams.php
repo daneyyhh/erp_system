@@ -8,14 +8,29 @@ require_once('../config/db.php');
 
 $page_title = "Examination Desk | Enlight";
 
-// Handle Examination Apply
+$pdo->exec("CREATE TABLE IF NOT EXISTS exam_applications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    status VARCHAR(50) DEFAULT 'Applied',
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
+
 $apply_success = false;
+$msg = "";
 if (isset($_POST['apply_exam'])) {
-    // In a real app, logic would go here to record the application
-    $apply_success = true;
-    $msg = "Examination application for 'End Semester Dec 2024' submitted successfully.";
-    $pdo->prepare("INSERT INTO notifications (user_id, message, type) VALUES (?, ?, 'Exam Alert')")->execute([$_SESSION['user_id'], $msg]);
+    
+    $check = $pdo->prepare("SELECT COUNT(*) FROM exam_applications WHERE user_id = ?");
+    $check->execute([$_SESSION['user_id']]);
+    if ($check->fetchColumn() == 0) {
+        $pdo->prepare("INSERT INTO exam_applications (user_id) VALUES (?)")->execute([$_SESSION['user_id']]);
+        $pdo->prepare("INSERT INTO notifications (user_id, message, type) VALUES (?, ?, 'Exam Alert')")->execute([$_SESSION['user_id'], "Application submitted"]);
+        $apply_success = true;
+    }
 }
+
+$check = $pdo->prepare("SELECT COUNT(*) FROM exam_applications WHERE user_id = ?");
+$check->execute([$_SESSION['user_id']]);
+$has_applied = $check->fetchColumn() > 0;
 
 $results = [
     ['code' => 'BCA-301', 'subject' => 'Database Systems', 'marks' => '85/100', 'status' => 'Pass'],
@@ -30,7 +45,7 @@ $results = [
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
 </head>
 <body>
     <div class="wrapper">
@@ -73,9 +88,15 @@ $results = [
                             </div>
                             
                             <form method="POST">
-                                <button type="submit" name="apply_exam" class="btn btn-premium w-100 py-3 rounded-4 fw-800">
-                                    <i class="fas fa-paper-plane me-2"></i> Submit Application
-                                </button>
+                                <?php if ($has_applied): ?>
+                                    <button class="btn btn-secondary w-100 py-3 rounded-4 fw-800" disabled>
+                                        <i class="fas fa-check-double me-2"></i> Application Registered
+                                    </button>
+                                <?php else: ?>
+                                    <button type="submit" name="apply_exam" class="btn btn-premium w-100 py-3 rounded-4 fw-800">
+                                        <i class="fas fa-paper-plane me-2"></i> Submit Application
+                                    </button>
+                                <?php endif; ?>
                             </form>
                         </div>
                     </div>

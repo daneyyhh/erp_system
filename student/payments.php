@@ -21,10 +21,10 @@ if (isset($_POST['pay_now'])) {
     // Notify Teachers
     $student_name = $_SESSION['user_name'];
     $teacher_msg = "Student $student_name has successfully paid their Semester Tuition Fees.";
-    $teachers = $pdo->query("SELECT user_id FROM users WHERE role = 'teacher'")->fetchAll();
+    $teachers = $pdo->query("SELECT id FROM users WHERE role = 'teacher'")->fetchAll();
     foreach($teachers as $t) {
         $notif_stmt = $pdo->prepare("INSERT INTO notifications (user_id, message, type) VALUES (?, ?, 'Fee Update')");
-        $notif_stmt->execute([$t['user_id'], $teacher_msg]);
+        $notif_stmt->execute([$t['id'], $teacher_msg]);
     }
 }
 
@@ -42,7 +42,7 @@ $fees = $stmt->fetchAll();
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
 </head>
 <body>
     <div class="wrapper">

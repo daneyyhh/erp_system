@@ -26,7 +26,7 @@ function getActionBadge($action) {
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
 </head>
 <body>
     <div class="wrapper">
@@ -43,7 +43,7 @@ function getActionBadge($action) {
                         <button class="btn btn-light border fw-bold px-4" onclick="location.reload()" style="border-radius:12px;">
                             <i class="fas fa-rotate me-2 text-primary"></i> Sync DB
                         </button>
-                        <a href="../logs/system_logs.csv" download class="btn btn-premium shadow-lg">
+                        <a href="export_logs.php" class="btn btn-premium shadow-lg">
                             <i class="fas fa-cloud-download-alt me-2"></i> Export Excel
                         </a>
                     </div>
