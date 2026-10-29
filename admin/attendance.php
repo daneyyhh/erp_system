@@ -8,10 +8,11 @@ require_once('../config/db.php');
 
 $page_title = "Institutional Attendance | Scholarly";
 
-// Fetch classes and status
-$classes = ["BCA 1st Year", "BCA 2nd Year", "BCA 3rd Year"];
-$reports = [];
+// Fetch all active classes from the students table
+$class_stmt = $pdo->query("SELECT DISTINCT class FROM students ORDER BY class ASC");
+$classes = $class_stmt->fetchAll(PDO::FETCH_COLUMN);
 
+$reports = [];
 foreach ($classes as $class) {
     $stmt = $pdo->prepare("SELECT 
         COUNT(a.id) as total,
@@ -31,7 +32,7 @@ foreach ($classes as $class) {
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body style="background: #f8fafc;">
     <div class="wrapper">
@@ -39,10 +40,17 @@ foreach ($classes as $class) {
         <div class="main-content">
             <?php include('../includes/topbar.php'); ?>
             <div class="content-area">
-                <div class="d-flex justify-content-between align-items-center mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-5 animate-up">
                     <div>
-                        <h2 class="fw-800 mb-1">Global Attendance Tracker</h2>
-                        <p class="text-muted small">Consolidated departmental records and performance indices</p>
+                        <h2 class="fw-800 mb-1">Institutional Attendance</h2>
+                        <p class="text-muted small fw-600">Consolidated departmental records and performance indices</p>
+                    </div>
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="search-pill">
+                            <i class="fas fa-search icon"></i>
+                            <input type="text" placeholder="Search class records..." onkeyup="filterClasses(this.value)">
+                            <button>FILTER</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -52,7 +60,7 @@ foreach ($classes as $class) {
                         $color = ($pct < 75) ? 'danger' : 'success';
                     ?>
                     <div class="col-md-4">
-                        <div class="card border-0 shadow-sm p-4" style="border-radius: 30px;">
+                        <div class="card class-card border-0 shadow-sm p-4 animate-up h-100" style="border-radius: 30px;">
                             <h5 class="fw-800 mb-3 text-primary"><?php echo $class; ?></h5>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted smallest fw-bold uppercase">AGGREGATE RATIO</span>
@@ -98,5 +106,14 @@ foreach ($classes as $class) {
             </div>
         </div>
     </div>
+    <script>
+    function filterClasses(query) {
+        query = query.toLowerCase();
+        document.querySelectorAll('.class-card').forEach(card => {
+            const className = card.querySelector('h5').innerText.toLowerCase();
+            card.closest('.col-md-4').style.display = className.includes(query) ? 'block' : 'none';
+        });
+    }
+    </script>
 </body>
 </html>

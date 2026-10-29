@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS teachers;
 DROP TABLE IF EXISTS students;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS logs;
+DROP TABLE IF EXISTS settings;
 
 CREATE DATABASE IF NOT EXISTS smart_college_erp;
 USE smart_college_erp;
@@ -96,7 +97,7 @@ CREATE TABLE certificates (
     student_id INT NOT NULL,
     type ENUM('Bonafide', 'TC', 'NOC', 'Migration') NOT NULL,
     applied_date DATE NOT NULL,
-    status ENUM('pending', 'approved', 'rejected', 'downloaded') DEFAULT 'pending',
+    status ENUM('pending', 'teacher_approved', 'approved', 'rejected', 'downloaded') DEFAULT 'pending',
     pdf_path VARCHAR(255),
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
@@ -150,3 +151,117 @@ INSERT INTO students (user_id, roll_no, class, semester) VALUES (3, 'S1001', 'BC
 
 -- Link Initial Fee
 INSERT INTO fees (student_id, amount, due_date, status) VALUES (1, 25000.00, '2024-12-30', 'pending');
+
+-- 12. Online Exams Table
+CREATE TABLE IF NOT EXISTS exams (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    subject_id INT,
+    class VARCHAR(50),
+    duration_minutes INT DEFAULT 30,
+    start_time DATETIME,
+    end_time DATETIME,
+    created_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('draft', 'active', 'closed') DEFAULT 'draft',
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 13. Exam Questions Table
+CREATE TABLE IF NOT EXISTS exam_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    exam_id INT NOT NULL,
+    question_text TEXT NOT NULL,
+    question_type ENUM('multiple_choice', 'true_false', 'short_answer') DEFAULT 'multiple_choice',
+    options JSON,
+    correct_answer TEXT NOT NULL,
+    marks INT DEFAULT 1,
+    FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE
+);
+
+-- 14. Exam Attempts Table
+CREATE TABLE IF NOT EXISTS exam_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    exam_id INT NOT NULL,
+    student_id INT NOT NULL,
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    end_time TIMESTAMP NULL,
+    score DECIMAL(5,2) DEFAULT 0,
+    status ENUM('in_progress', 'completed') DEFAULT 'in_progress',
+    FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
+-- 15. Exam Answers Table
+CREATE TABLE IF NOT EXISTS exam_answers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    attempt_id INT NOT NULL,
+    question_id INT NOT NULL,
+    answer TEXT,
+    is_correct BOOLEAN DEFAULT FALSE,
+    marks_obtained INT DEFAULT 0,
+    FOREIGN KEY (attempt_id) REFERENCES exam_attempts(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES exam_questions(id) ON DELETE CASCADE
+);
+
+-- 16. Library Books Table
+CREATE TABLE IF NOT EXISTS library_books (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author VARCHAR(255),
+    isbn VARCHAR(100) UNIQUE,
+    total_copies INT DEFAULT 1,
+    available_copies INT DEFAULT 1,
+    status ENUM('active', 'archived') DEFAULT 'active'
+);
+
+-- 17. Library Issued Records Table
+CREATE TABLE IF NOT EXISTS library_issued (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT NOT NULL,
+    student_id INT NOT NULL,
+    issue_date DATE NOT NULL,
+    due_date DATE NOT NULL,
+    return_date DATE,
+    status ENUM('issued', 'returned', 'overdue') DEFAULT 'issued',
+    FOREIGN KEY (book_id) REFERENCES library_books(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
+-- 18. Hostel Rooms Table
+CREATE TABLE IF NOT EXISTS hostel_rooms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_number VARCHAR(50) UNIQUE NOT NULL,
+    capacity INT DEFAULT 2,
+    occupancy INT DEFAULT 0,
+    type ENUM('ac', 'non-ac') DEFAULT 'non-ac',
+    fee_per_semester DECIMAL(10, 2) NOT NULL
+);
+
+-- 19. Hostel Allocations Table
+CREATE TABLE IF NOT EXISTS hostel_allocations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_id INT NOT NULL,
+    student_id INT NOT NULL,
+    allocated_from DATE NOT NULL,
+    allocated_to DATE,
+    status ENUM('active', 'vacated') DEFAULT 'active',
+    FOREIGN KEY (room_id) REFERENCES hostel_rooms(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
+-- 20. Settings Table
+CREATE TABLE IF NOT EXISTS settings (
+    setting_key VARCHAR(100) PRIMARY KEY,
+    setting_value TEXT
+);
+
+INSERT IGNORE INTO settings (setting_key, setting_value) VALUES 
+('institution_name', 'Smart College ERP'),
+('tagline', 'Excellence in Education'),
+('email', 'admin@scholarly.com'),
+('phone', '1234567890'),
+('address', '123 Smart Campus, Tech City'),
+('late_fine_rate', '10');

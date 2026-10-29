@@ -27,7 +27,7 @@ $page_title = "Academic Results | Scholarly";
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body style="background: #f8fafc;">
     <div class="wrapper">
@@ -40,9 +40,9 @@ $page_title = "Academic Results | Scholarly";
                         <h2 class="fw-800 mb-1">Academic Transcript</h2>
                         <p class="text-muted small">Official record of internal and external examination scores</p>
                     </div>
-                    <button class="btn btn-primary px-4 py-2 shadow-sm fw-bold" style="border-radius:12px;" onclick="window.print()">
-                        <i class="fas fa-print me-2"></i> Print Transcript
-                    </button>
+                    <a href="../download.php?type=transcript&id=<?php echo $_SESSION['user_id']; ?>" class="btn btn-primary px-4 py-2 shadow-sm fw-bold" style="border-radius:12px;">
+                        <i class="fas fa-download me-2"></i> Download Transcript
+                    </a>
                 </div>
                 
                 <div class="row g-4 mb-5">

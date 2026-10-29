@@ -30,7 +30,7 @@ A modern, web-based College Management System designed to digitize administrativ
    - Access via `http://localhost/ERP_SYSTEM/login.php`.
 
 ## 🔑 Default Credentials (Admin)
-- **Email**: `admin@college.com`
+- **Email**: `admin@scholary.com`
 - **Password**: `admin123`
 - **Role**: Admin
 

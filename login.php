@@ -10,293 +10,198 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PurpleHeart College | Portal Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>PurpleHeart College | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo time(); ?>">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #F8F9FA;
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#F8F7FF; display:flex; min-height:100vh; }
 
-        .split-layout {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-        }
-
-        /* LEFT SIDE - BRANDING */
-        .brand-side {
+        .left-panel {
             flex: 1;
-            background: #FDFDFD;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: linear-gradient(145deg, #4C1D95 0%, #7C3AED 50%, #A78BFA 100%);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: flex-start;
             padding: 80px;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
-
-        .brand-text-container {
-            position: relative;
-            z-index: 10;
-            max-width: 600px;
-        }
-
-        .purple-heading {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #8E24AA;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -1.5px;
-        }
-
-        .purple-subtext {
-            font-size: 1.25rem;
-            color: #636E72;
-            font-weight: 500;
-            line-height: 1.6;
-        }
-
-        /* Abstract purple curves from Behance UI */
-        .abstract-curve-top {
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 500px;
-            height: 500px;
-            border-radius: 50%;
-            border: 40px solid #F3E5F5;
-            z-index: 1;
-            opacity: 0.6;
-        }
-        
-        .abstract-curve-top::after {
+        .left-panel::before {
             content: '';
-            position: absolute;
-            top: 40px;
-            right: 40px;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            border: 20px solid rgba(142, 36, 170, 0.1);
+            position: absolute; top: -120px; right: -120px;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: rgba(255,255,255,0.06);
         }
-
-        .abstract-curve-bottom {
-            position: absolute;
-            bottom: -150px;
-            left: -150px;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            border: 2px solid #8E24AA;
-            z-index: 1;
-            box-shadow: inset 0 0 0 40px transparent, inset 0 0 0 42px #8E24AA, inset 0 0 0 60px transparent, inset 0 0 0 62px #8E24AA, inset 0 0 0 80px transparent, inset 0 0 0 82px #8E24AA;
-            opacity: 0.15;
-            transform: rotate(45deg);
+        .left-panel::after {
+            content: '';
+            position: absolute; bottom: -80px; left: -80px;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: rgba(255,255,255,0.04);
         }
-
-        /* RIGHT SIDE - LOGIN */
-        .login-side {
-            width: 550px;
-            background: #FFFFFF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            box-shadow: -20px 0 50px rgba(0,0,0,0.03);
-            z-index: 20;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            background: #FFFFFF;
-        }
-
-        .login-header {
+        .brand-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 9999px;
+            padding: 8px 18px;
+            color: #fff; font-size: 13px; font-weight: 600;
             margin-bottom: 40px;
         }
-
-        .college-logo-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            justify-content: center;
-        }
-
-        .college-logo {
-            width: 56px;
-            height: 56px;
-            background: #8E24AA;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .left-heading {
+            font-size: 3.2rem;
+            font-weight: 800;
             color: #fff;
-            font-size: 24px;
-            box-shadow: 0 10px 20px rgba(142, 36, 170, 0.2);
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+            margin-bottom: 24px;
+        }
+        .left-sub {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.75);
+            font-weight: 400;
+            line-height: 1.7;
+            max-width: 460px;
+        }
+        .stats-row {
+            display: flex; gap: 32px;
+            margin-top: 48px;
+        }
+        .stat-item { color: rgba(255,255,255,0.9); }
+        .stat-num { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+        .stat-label { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+        .right-panel {
+            width: 480px;
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            padding: 48px 40px;
+        }
+        .form-card { width: 100%; max-width: 360px; }
+
+        .form-logo {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #7C3AED, #A78BFA);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 20px;
+            box-shadow: 0 8px 20px rgba(124,58,237,0.3);
+            margin-bottom: 28px;
+        }
+        .form-title { font-size: 1.6rem; font-weight: 800; color: #1E1B4B; margin-bottom: 6px; }
+        .form-sub { font-size: 13px; color: #9CA3AF; font-weight: 500; margin-bottom: 32px; }
+
+        .field-label {
+            display: block; font-size: 12px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.6px;
+            color: #1E1B4B; margin-bottom: 8px;
+        }
+        .field-input {
+            width: 100%; padding: 12px 16px;
+            border: 1.5px solid #EDE9FE;
+            border-radius: 10px;
+            background: #F8F7FF;
+            font-size: 14px; font-weight: 500; color: #1E1B4B;
+            transition: all 0.2s; margin-bottom: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        .field-input:focus {
+            outline: none; border-color: #7C3AED;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+        }
+        .forgot-link {
+            display: block; text-align: right;
+            font-size: 12.5px; font-weight: 600;
+            color: #7C3AED; text-decoration: none;
+            margin-top: -12px; margin-bottom: 24px;
+        }
+        .forgot-link:hover { color: #6D28D9; }
+
+        .btn-login {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #7C3AED, #6D28D9);
+            color: #fff; border: none;
+            border-radius: 10px;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(124,58,237,0.35);
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(124,58,237,0.45);
         }
 
-        .college-name {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #2D3436;
-            margin: 0;
-            letter-spacing: -0.5px;
+        .register-link {
+            text-align: center; margin-top: 24px;
+            font-size: 13px; color: #9CA3AF; font-weight: 500;
         }
+        .register-link a { color: #7C3AED; font-weight: 700; text-decoration: none; }
 
-        .welcome-back {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #2D3436;
-            margin-bottom: 8px;
+        .error-box {
+            background: #FEF2F2; border: 1.5px solid #FCA5A5;
+            color: #DC2626; border-radius: 10px;
+            padding: 12px 16px; font-size: 13px; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 24px;
         }
-
-        .instruction-text {
-            color: #636E72;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .form-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #2D3436;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-
-        .form-control-custom {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 2px solid #E2E8F0;
-            background: #F8FAFC;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #2D3436;
-            transition: 0.3s;
+        .success-box {
+            background: #F0FDF4; border: 1.5px solid #86EFAC;
+            color: #166534; border-radius: 10px;
+            padding: 12px 16px; font-size: 13px; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
             margin-bottom: 24px;
         }
 
-        .form-control-custom:focus {
-            outline: none;
-            border-color: #8E24AA;
-            background: #FFFFFF;
-            box-shadow: 0 0 0 4px #F3E5F5;
-        }
-
-        .btn-purple {
-            width: 100%;
-            padding: 16px;
-            background: #8E24AA;
-            color: #FFFFFF;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 10px 25px rgba(142, 36, 170, 0.25);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-purple:hover {
-            background: #7B1FA2;
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(142, 36, 170, 0.35);
-        }
-
-        .error-card {
-            background: #FEF2F2;
-            border: 1px solid #FCA5A5;
-            color: #991B1B;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        @media (max-width: 992px) {
-            .brand-side { display: none; }
-            .login-side { width: 100%; box-shadow: none; }
+        @media (max-width: 900px) {
+            .left-panel { display: none; }
+            .right-panel { width: 100%; }
         }
     </style>
 </head>
 <body>
-
-    <div class="split-layout">
-        <!-- Behance Featured UI Branding Side -->
-        <div class="brand-side">
-            <div class="abstract-curve-top"></div>
-            <div class="abstract-curve-bottom"></div>
-            
-            <div class="brand-text-container animate-up">
-                <h1 class="purple-heading">The all-new school portal fixes that, and more...</h1>
-                <p class="purple-subtext">Designed for an effortless experience. Log in to track attendance, clear fees, apply for official certificates, and trace your academic progress in real-time right from your dashboard.</p>
-            </div>
-        </div>
-
-        <!-- Login Card Side -->
-        <div class="login-side">
-            <div class="login-card animate-up" style="animation-delay: 0.2s;">
-                <div class="login-header text-center">
-                    <div class="college-logo-wrapper">
-                        <div class="college-logo"><i class="fas fa-heart"></i></div>
-                        <h2 class="college-name">PurpleHeart <span style="font-weight:400;">College</span></h2>
-                    </div>
-                    <div style="text-align: left; margin-top: 50px;">
-                        <h3 class="welcome-back">Sign In</h3>
-                        <p class="instruction-text">Enter your academic credentials to access the portal.</p>
-                    </div>
-                </div>
-
-                <?php if (isset($_GET['error'])): ?>
-                    <div class="error-card">
-                        <i class="fas fa-exclamation-circle fs-5"></i>
-                        <div>
-                            <div>Authentication Failed</div>
-                            <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 2px;">Check your email or password.</div>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <form action="auth/process_login.php" method="POST">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" name="email" class="form-control-custom" placeholder="e.g. admin@scholarly.com" required>
-
-                    <label class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control-custom" placeholder="••••••••" required>
-
-                    <div style="text-align: right; margin-top: -15px; margin-bottom: 25px;">
-                        <a href="#" style="color: #8E24AA; font-size: 0.85rem; font-weight: 700; text-decoration: none;">Forgot Password?</a>
-                    </div>
-
-                    <button type="submit" class="btn-purple">
-                        Secure Authentication <i class="fas fa-arrow-right"></i>
-                    </button>
-                </form>
-            </div>
+    <div class="left-panel">
+        <div class="brand-badge"><i class="fas fa-heart"></i> PurpleHeart College</div>
+        <h1 class="left-heading">The smart way to manage your academic life.</h1>
+        <p class="left-sub">Access attendance records, fee tracking, exam results, certificate requests and more — all in one unified portal designed for your institution.</p>
+        <div class="stats-row">
+            <div class="stat-item"><div class="stat-num">15K+</div><div class="stat-label">Students</div></div>
+            <div class="stat-item"><div class="stat-num">2K+</div><div class="stat-label">Teachers</div></div>
+            <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Satisfaction</div></div>
         </div>
     </div>
 
+    <div class="right-panel">
+        <div class="form-card">
+            <div class="form-logo"><i class="fas fa-heart"></i></div>
+            <h2 class="form-title">Welcome back</h2>
+            <p class="form-sub">Sign in to access your portal dashboard.</p>
+
+            <?php if (isset($_GET['error'])): ?>
+                <div class="error-box"><i class="fas fa-exclamation-circle"></i> Invalid email or password.</div>
+            <?php endif; ?>
+            <?php if (isset($_GET['msg']) && $_GET['msg'] == 'password_reset'): ?>
+                <div class="success-box"><i class="fas fa-check-circle"></i> Password reset successfully. You can now log in.</div>
+            <?php endif; ?>
+
+            <form action="auth/process_login.php" method="POST">
+                <label class="field-label">Email Address</label>
+                <input type="email" name="email" class="field-input" placeholder="your@email.com" required>
+
+                <label class="field-label">Password</label>
+                <input type="password" name="password" class="field-input" placeholder="••••••••" required>
+
+                <a href="forgot_password.php" class="forgot-link">Forgot password?</a>
+
+                <button type="submit" class="btn-login">
+                    Sign In <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="register-link">
+                New here? <a href="register.php">Create an account</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

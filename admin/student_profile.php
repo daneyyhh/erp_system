@@ -14,7 +14,7 @@ if (!$student_id) { die("No student ID provided."); }
 $stmt = $pdo->prepare("SELECT s.*, u.name, u.email, u.phone 
                        FROM students s 
                        JOIN users u ON s.user_id = u.id 
-                       WHERE s.roll_no = ?");
+                       WHERE u.id = ?");
 $stmt->execute([$student_id]);
 $student = $stmt->fetch();
 
@@ -25,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remarks'])) {
     $remarks = filter_var($_POST['remarks'], FILTER_SANITIZE_STRING);
     try {
         $pdo->query("ALTER TABLE students ADD COLUMN IF NOT EXISTS remarks TEXT");
-        $update = $pdo->prepare("UPDATE students SET remarks = ? WHERE roll_no = ?");
+        $update = $pdo->prepare("UPDATE students SET remarks = ? WHERE user_id = ?");
         $update->execute([$remarks, $student_id]);
-        logToExcel('Remarks Update', $_SESSION['user_id'], $_SESSION['user_name'], "Added remarks for $student_id");
+        logToExcel('Remarks Update', $_SESSION['user_id'], $_SESSION['user_name'], "Added remarks for student ID: $student_id");
         $success = "Remarks updated successfully!";
         $student['remarks'] = $remarks;
     } catch (Exception $e) {
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remarks'])) {
     <title>Profile: <?php echo $student['name']; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
     <style>
         .profile-container { display: flex; gap: 40px; }
         .profile-left { width: 350px; flex-shrink: 0; }

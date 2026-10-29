@@ -1,165 +1,298 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ../login.php");
-    exit();
+    header("Location: ../login.php"); exit();
 }
 require_once('../config/db.php');
 
-$page_title = "Command Centre | Project ERP";
+$page_title = "Admin Dashboard";
 
-// Real Stats
-$count_students = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn();
-$count_faculty = $pdo->query("SELECT COUNT(*) FROM users WHERE role='teacher'")->fetchColumn();
-$count_pending_certs = $pdo->query("SELECT COUNT(*) FROM certificates WHERE status='pending'")->fetchColumn();
+// Stats
+$total_students = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn() ?: 0;
+$total_teachers  = $pdo->query("SELECT COUNT(*) FROM teachers")->fetchColumn() ?: 0;
+$total_parents   = $pdo->query("SELECT COUNT(*) FROM users WHERE role='parent'")->fetchColumn() ?: 0;
 
-// KPI Mock Data for Admin
-$kpis = [
-    ['title' => 'Student Enrollment', 'value' => $count_students, 'total' => '500', 'trend' => '+12 Monthly', 'trend_up' => true],
-    ['title' => 'Average Attendance', 'value' => '84', 'total' => '100', 'trend' => '+2.5% Today', 'trend_up' => true],
-    ['title' => 'Faculty Strength', 'value' => $count_faculty, 'total' => '40', 'trend' => 'Stable', 'trend_up' => true]
-];
+// Try fees total
+try { $total_fees = $pdo->query("SELECT COALESCE(SUM(amount),0) FROM fees")->fetchColumn(); }
+catch (Exception $e) { $total_fees = 0; }
+
+// Recent students
+try {
+    $recent_students = $pdo->query("
+        SELECT u.name, s.roll_no, s.class, s.section
+        FROM students s JOIN users u ON s.user_id = u.id
+        ORDER BY s.id DESC LIMIT 5
+    ")->fetchAll();
+} catch (Exception $e) { $recent_students = []; }
+
+// Marks by month for chart (simulate if empty)
+try {
+    $months_data = $pdo->query("
+        SELECT MONTH(created_at) as m, AVG(marks_obtained) as avg_marks
+        FROM marks
+        GROUP BY MONTH(created_at)
+        ORDER BY m ASC
+    ")->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
+} catch (Exception $e) { $months_data = []; }
+
+// Build chart data
+$month_labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+$student_vals = []; $teacher_vals = [];
+for ($i = 1; $i <= 12; $i++) {
+    $student_vals[] = $months_data[$i] ?? rand(60, 95);
+    $teacher_vals[] = rand(50, 90);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $page_title; ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $page_title; ?> | ia Academy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="wrapper">
-        <?php include('../includes/sidebar.php'); ?>
-        <div class="main-content">
-            <?php include('../includes/topbar.php'); ?>
-            
-            <div class="content-area">
-                <div class="row g-4 mb-5">
-                    <?php foreach($kpis as $k): ?>
-                    <div class="col-md-4">
-                        <div class="card-premium kpi-card animate-fade">
-                            <div class="kpi-title">
-                                <?php echo $k['title']; ?>
-                                <i class="fas fa-ellipsis-h text-muted smallest"></i>
-                            </div>
-                            <div class="d-flex align-items-baseline gap-2">
-                                <span class="kpi-value"><?php echo $k['value']; ?></span>
-                                <span class="text-muted fw-bold">/<?php echo $k['total']; ?></span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div class="smallest text-muted">Real-time DB Metric</div>
-                                <span class="trend-badge <?php echo $k['trend_up'] ? 'trend-up' : 'trend-down'; ?>">
-                                    <?php echo $k['trend']; ?>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
+<div class="wrapper">
+    <?php include('../includes/sidebar.php'); ?>
+    <div class="main-content">
+        <?php include('../includes/topbar.php'); ?>
+        <div class="content-area">
+
+            <!-- Page header -->
+            <div class="page-header animate-up">
+                <div>
+                    <div class="page-title">Admin Dashboard</div>
+                    <div class="page-sub">Welcome back, <?php echo htmlspecialchars($_SESSION['user_name']); ?>! Here's what's happening.</div>
                 </div>
+                <div class="d-flex gap-2">
+                    <a href="admissions.php" class="btn btn-outline btn-sm"><i class="fas fa-plus"></i> New Admission</a>
+                    <a href="students_list.php" class="btn btn-primary btn-sm"><i class="fas fa-users"></i> View Students</a>
+                </div>
+            </div>
 
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <!-- Growth Chart -->
-                        <div class="card-premium mb-4 animate-fade">
-                            <div class="d-flex justify-content-between align-items-center mb-5">
-                                <div>
-                                    <h5 class="fw-800 mb-1">Institutional Performance</h5>
-                                    <p class="smallest text-muted">Tracking student growth and academic outcomes</p>
-                                </div>
-                                <div class="btn-group shadow-sm" style="border-radius: 12px; overflow: hidden;">
-                                    <button class="btn btn-light btn-sm fw-bold active">Daily</button>
-                                    <button class="btn btn-light btn-sm fw-bold">Weekly</button>
-                                </div>
-                            </div>
-                            <canvas id="growthChart" height="200"></canvas>
-                        </div>
-
-                        <!-- System Logs Export Card -->
-                        <div class="card-premium animate-fade" style="background: linear-gradient(135deg, #5e5adb, #8a84ff); color: white;">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <h4 class="fw-800 text-white mb-2">Live System Audit Logs</h4>
-                                    <p class="opacity-75 small mb-4">Export all historical student interactions and faculty actions to a live Excel ledger for compliance and review.</p>
-                                    <a href="../logs/system_logs.csv" class="btn btn-light fw-bold px-4 py-2" style="border-radius: 12px; color: #5e5adb;">
-                                        <i class="fas fa-file-excel me-2"></i> Download Audit Ledger
-                                    </a>
-                                </div>
-                                <div class="col-md-4 text-center d-none d-md-block">
-                                    <i class="fas fa-database fa-5x opacity-25"></i>
-                                </div>
-                            </div>
+            <!-- KPI Row -->
+            <div class="row g-3 mb-4 animate-up">
+                <div class="col-6 col-md-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon purple"><i class="fas fa-user-graduate"></i></div>
+                        <div>
+                            <div class="kpi-title">Students</div>
+                            <div class="kpi-value"><?php echo number_format($total_students/1000,2); ?>K</div>
+                            <div class="kpi-badge trend-up"><i class="fas fa-arrow-up"></i> 12% this month</div>
                         </div>
                     </div>
-
-                    <div class="col-lg-4">
-                        <div class="card-premium h-100 animate-fade">
-                            <h5 class="fw-800 mb-4">Urgent Operations</h5>
-                            
-                            <!-- Pending Approvals -->
-                            <div class="lecturer-item border shadow-sm mb-4" style="background: #fffafa;">
-                                <div class="bg-danger bg-opacity-10 p-3 rounded-4 me-3">
-                                    <i class="fas fa-certificate text-danger fs-4"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="fw-800 mb-1"><?php echo $count_pending_certs; ?> Pending Requests</h6>
-                                    <div class="smallest text-muted fw-bold">Awaiting Final Issuance</div>
-                                    <a href="certificates.php" class="text-decoration-none smallest fw-800 text-danger mt-1 d-block">TAKE ACTION <i class="fas fa-arrow-right ms-1"></i></a>
-                                </div>
-                            </div>
-
-                            <h5 class="fw-800 mb-4 pt-3 border-top">Quick Links</h5>
-                            <div class="d-grid gap-2">
-                                <a href="students_list.php" class="btn btn-light text-start py-3 px-4 border shadow-sm" style="border-radius: 18px;">
-                                    <i class="fas fa-user-plus text-primary me-3"></i> <b>Enroll Student</b>
-                                </a>
-                                <a href="attendance.php" class="btn btn-light text-start py-3 px-4 border shadow-sm" style="border-radius: 18px;">
-                                    <i class="fas fa-calendar-check text-success me-3"></i> <b>Mark Daily Status</b>
-                                </a>
-                                <a href="marks.php" class="btn btn-light text-start py-3 px-4 border shadow-sm" style="border-radius: 18px;">
-                                    <i class="fas fa-file-invoice-dollar text-warning me-3"></i> <b>Academic Fees</b>
-                                </a>
-                            </div>
-
-                            <div class="bg-light p-4 rounded-4 mt-5">
-                                <p class="smallest text-muted fw-bold mb-0 text-center"><i class="fas fa-shield-check me-2"></i> System Secured via Cloud Security</p>
-                            </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon orange"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div>
+                            <div class="kpi-title">Teachers</div>
+                            <div class="kpi-value"><?php echo number_format($total_teachers/1000,2); ?>K</div>
+                            <div class="kpi-badge trend-up"><i class="fas fa-arrow-up"></i> 5% this month</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon green"><i class="fas fa-users"></i></div>
+                        <div>
+                            <div class="kpi-title">Parents</div>
+                            <div class="kpi-value"><?php echo number_format($total_parents/1000,1); ?>K</div>
+                            <div class="kpi-badge trend-up"><i class="fas fa-arrow-up"></i> 8% this month</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="kpi-card">
+                        <div class="kpi-icon blue"><i class="fas fa-money-bill-wave"></i></div>
+                        <div>
+                            <div class="kpi-title">Earnings</div>
+                            <div class="kpi-value">₹<?php echo number_format($total_fees/1000,1); ?>K</div>
+                            <div class="kpi-badge trend-up"><i class="fas fa-arrow-up"></i> 18% this month</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Charts Row -->
+            <div class="row g-3 mb-4 animate-up">
+                <!-- Bar Chart -->
+                <div class="col-md-8">
+                    <div class="card h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <div class="card-title">All Exam Results</div>
+                                <div class="card-sub">Students &amp; Teachers performance by month</div>
+                            </div>
+                            <div class="d-flex gap-3" style="font-size:12px;font-weight:600;">
+                                <span style="color:var(--primary);"><i class="fas fa-circle" style="font-size:8px;"></i> Teacher</span>
+                                <span style="color:var(--secondary);"><i class="fas fa-circle" style="font-size:8px;"></i> Student</span>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height:220px;">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Donut Chart -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-title mb-1">Students</div>
+                        <div class="card-sub mb-3">Gender distribution</div>
+                        <div class="chart-container" style="height:160px;">
+                            <canvas id="donutChart"></canvas>
+                        </div>
+                        <div style="text-align:center;margin-top:12px;">
+                            <div style="font-size:28px;font-weight:800;color:var(--text);"><?php echo number_format($total_students); ?></div>
+                            <div style="font-size:12px;color:var(--text-muted);">Total Students</div>
+                        </div>
+                        <div class="d-flex justify-content-center gap-4 mt-3" style="font-size:12px;font-weight:600;">
+                            <span style="color:var(--primary);"><i class="fas fa-circle" style="font-size:8px;"></i> Male</span>
+                            <span style="color:var(--secondary);"><i class="fas fa-circle" style="font-size:8px;"></i> Female</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="row g-3 animate-up">
+                <!-- Star Students Table -->
+                <div class="col-md-7">
+                    <div class="card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="card-title">Star Students</div>
+                            <a href="students_list.php" style="font-size:12px;font-weight:600;color:var(--primary);text-decoration:none;">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Name</th>
+                                        <th>ID</th>
+                                        <th>Class</th>
+                                        <th>Section</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($recent_students)): ?>
+                                        <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">No student data yet.</td></tr>
+                                    <?php endif; ?>
+                                    <?php foreach ($recent_students as $i => $s): ?>
+                                    <tr>
+                                        <td>
+                                            <div class="table-avatar" style="background:var(--primary-light);color:var(--primary);font-weight:700;">
+                                                <?php echo strtoupper(substr($s['name'],0,1)); ?>
+                                            </div>
+                                        </td>
+                                        <td style="font-weight:600;"><?php echo htmlspecialchars($s['name']); ?></td>
+                                        <td style="color:var(--text-muted);font-size:12px;"><?php echo htmlspecialchars($s['roll_no'] ?? 'N/A'); ?></td>
+                                        <td><?php echo htmlspecialchars($s['class'] ?? '-'); ?></td>
+                                        <td><span class="badge badge-purple"><?php echo htmlspecialchars($s['section'] ?? '-'); ?></span></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links / Notices -->
+                <div class="col-md-5">
+                    <div class="card h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="card-title">All Exam Results</div>
+                            <a href="marks.php" style="font-size:12px;font-weight:600;color:var(--primary);text-decoration:none;">View All</a>
+                        </div>
+                        <?php
+                            $links = [
+                                ['admissions.php','fa-file-alt','green','Admissions','Manage new applications'],
+                                ['certificates.php','fa-certificate','red','Certificates','Review & approve'],
+                                ['timetable_master.php','fa-calendar-alt','purple','Timetable','View weekly schedule'],
+                                ['transport.php','fa-bus','green','Transport','Live tracking'],
+                            ];
+                        foreach ($notices_as_links ?? $links as $n): ?>
+                        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);">
+                            <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+                                background:var(--<?php echo $n[2]==='orange'?'secondary':$n[2]; ?>-light);
+                                color:var(--<?php echo $n[2]==='orange'?'secondary':$n[2]; ?>);
+                                font-size:14px;flex-shrink:0;">
+                                <i class="fas <?php echo $n[1]; ?>"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <a href="<?php echo $n[0]; ?>" style="text-decoration:none;">
+                                    <div style="font-size:13px;font-weight:600;color:var(--text);"><?php echo $n[3]; ?></div>
+                                    <div style="font-size:11.5px;color:var(--text-muted);"><?php echo $n[4]; ?></div>
+                                </a>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                        <a href="admissions.php" class="btn btn-outline btn-sm w-100 mt-3" style="justify-content:center;">View All</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+</div>
 
-    <script>
-        const ctx = document.getElementById('growthChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                datasets: [{
-                    label: 'Campus Activity',
-                    data: [40, 65, 55, 90, 85, 95],
-                    borderColor: '#5e5adb',
-                    backgroundColor: 'rgba(94, 90, 219, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#5e5adb'
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false } },
-                    x: { grid: { display: false }, border: { display: false } }
-                }
-            }
-        });
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ── Bar Chart ─────────────────────────────────────────────
+const bcCtx = document.getElementById('barChart').getContext('2d');
+new Chart(bcCtx, {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($month_labels); ?>,
+        datasets: [{
+            label: 'Teacher',
+            data: <?php echo json_encode($teacher_vals); ?>,
+            backgroundColor: '#7C3AED',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.4,
+        },{
+            label: 'Student',
+            data: <?php echo json_encode($student_vals); ?>,
+            backgroundColor: '#F59E0B',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.4,
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Inter' }, color: '#9CA3AF' } },
+            y: { grid: { color: '#F3F4F6' }, ticks: { font: { size: 11, family: 'Inter' }, color: '#9CA3AF' } }
+        }
+    }
+});
+
+// ── Donut Chart ───────────────────────────────────────────
+const dcCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(dcCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Male', 'Female'],
+        datasets: [{
+            data: [60, 40],
+            backgroundColor: ['#7C3AED', '#F59E0B'],
+            borderWidth: 0,
+            hoverOffset: 4,
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '72%',
+        plugins: { legend: { display: false } }
+    }
+});
+</script>
 </body>
 </html>

@@ -1,0 +1,12 @@
+.git
+.vercel
+.env*
+node_modules
+otp-server
+scratch
+logs/*.csv
+debug*.php
+debug*.txt
+*.sql
+*.md
+

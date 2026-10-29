@@ -24,7 +24,7 @@ $classmates = $stmt->fetchAll();
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="wrapper">
@@ -42,7 +42,7 @@ $classmates = $stmt->fetchAll();
                 <div class="card-premium animate-up">
                     <h5 class="fw-800 mb-4 px-2">Batch Strength: <?php echo count($classmates); ?> Students</h5>
                     <div class="table-responsive">
-                        <table class="glass-table">
+                        <table class="table glass-table">
                             <thead>
                                 <tr>
                                     <th>Roll No</th>

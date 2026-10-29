@@ -39,7 +39,7 @@ $page_title = "My Documents | Enlight";
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="wrapper">
@@ -66,13 +66,13 @@ $page_title = "My Documents | Enlight";
                 <div class="card-premium animate-up">
                     <h5 class="fw-800 mb-4">Application History</h5>
                     <div class="table-responsive">
-                        <table class="glass-table">
+                        <table class="table glass-table">
                             <thead>
                                 <tr>
-                                    <th>Date Applied</th>
-                                    <th>Document Type</th>
-                                    <th>Status</th>
-                                    <th class="text-end">Actions</th>
+                                    <th style="padding: 20px 24px; text-align: left;">Date Applied</th>
+                                    <th style="padding: 20px 24px; text-align: left;">Document Type</th>
+                                    <th style="padding: 20px 24px; text-align: left;">Status</th>
+                                    <th style="padding: 20px 24px; text-align: right;" class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,18 +81,18 @@ $page_title = "My Documents | Enlight";
                                 <?php endif; ?>
                                 <?php foreach($my_certs as $c): ?>
                                 <tr>
-                                    <td class="text-muted fw-bold"><?php echo $c['applied_date']; ?></td>
-                                    <td class="fw-800"><?php echo $c['type']; ?> Certificate</td>
-                                    <td>
-                                        <?php if($c['status'] == 'pending'): ?>
-                                            <span class="badge bg-warning bg-opacity-10 text-warning fw-extrabold p-2 small px-3">PENDING</span>
-                                        <?php elseif($c['status'] == 'approved'): ?>
-                                            <span class="badge bg-success bg-opacity-10 text-success fw-extrabold p-2 small px-3">READY</span>
+                                    <td style="padding: 24px;" class="text-muted fw-bold"><?php echo $c['applied_date']; ?></td>
+                                    <td style="padding: 24px;" class="fw-800"><?php echo $c['type']; ?> Certificate</td>
+                                    <td style="padding: 24px;">
+                                        <?php if($c['status'] == 'approved'): ?>
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success">Ready</span>
+                                        <?php elseif($c['status'] == 'rejected'): ?>
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Rejected</span>
                                         <?php else: ?>
-                                            <span class="badge bg-danger bg-opacity-10 text-danger fw-extrabold p-2 small px-3">REJECTED</span>
+                                            <span class="badge bg-warning bg-opacity-10 text-warning border border-warning">Pending</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-end">
+                                    <td style="padding: 24px;" class="text-end">
                                         <?php if($c['status'] == 'approved'): ?>
                                             <a href="../download.php?type=certificate&id=<?php echo $c['id']; ?>" class="btn btn-sm btn-outline-primary fw-800 px-3">
                                                 <i class="fas fa-download me-2"></i> Download
@@ -129,6 +129,7 @@ $page_title = "My Documents | Enlight";
                             <option value="TC">Transfer Certificate (TC)</option>
                             <option value="NOC">No Objection Certificate (NOC)</option>
                             <option value="Migration">Migration Certificate</option>
+                            <option value="Hall Ticket">Exam Hall Ticket</option>
                         </select>
                         <p class="smallest text-muted"><i class="fas fa-info-circle me-1 text-primary"></i> Documents are usually processed within 3-5 working days by the registrar's office.</p>
                     </div>

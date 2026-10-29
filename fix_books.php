@@ -1,0 +1,1 @@
+<?php require_once(__DIR__.'/config/db.php'); try { $pdo->exec("ALTER TABLE library_books ADD COLUMN status ENUM('active', 'inactive') DEFAULT 'active'"); echo "status added"; } catch(Exception $e){} 

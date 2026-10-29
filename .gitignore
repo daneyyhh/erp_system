@@ -3,6 +3,7 @@
 Thumbs.db
 node_modules/
 .env
+.env*
 
 # XAMPP/Local Logs
 logs/
@@ -13,3 +14,11 @@ logs/
 
 # Database Config Fallbacks
 /config/ca.pem
+
+# Temporary / Debug files
+scratch/
+debug*.txt
+debug*.php
+insert_dummy_cert.php
+ERP_System_Summary.txt
+

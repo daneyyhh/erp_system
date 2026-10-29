@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'parent') {
 require_once('../config/db.php');
 
 // Mock ward selection
-$student_stmt = $pdo->query("SELECT s.id, u.name FROM students s JOIN users u ON s.user_id = u.id LIMIT 1");
+$student_stmt = $pdo->query("SELECT s.id, u.id as user_id, u.name FROM students s JOIN users u ON s.user_id = u.id LIMIT 1");
 $ward = $student_stmt->fetch();
 $ward_id = $ward['id'] ?? 0;
 
@@ -28,7 +28,7 @@ $page_title = "Ward Progress Report | Scholarly";
     <title><?php echo $page_title; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <link rel="stylesheet" href="../assets/css/style.css?v=<?php echo time(); ?>">
     <style>
         @media print {
             body * { visibility: hidden; }
@@ -56,9 +56,9 @@ $page_title = "Ward Progress Report | Scholarly";
                             <p class="text-muted small mb-0">Academic Performance Tracking</p>
                         </div>
                     </div>
-                    <button class="btn btn-primary px-4 py-2 shadow-sm fw-bold" style="border-radius:12px;" onclick="window.print()">
+                    <a href="../download.php?type=transcript&id=<?php echo $ward['user_id'] ?? 0; ?>" class="btn btn-primary px-4 py-2 shadow-sm fw-bold" style="border-radius:12px;">
                         <i class="fas fa-download me-2"></i> Export Report
-                    </button>
+                    </a>
                 </div>
 
                 <div id="printableArea" class="card border-0 shadow-sm p-5" style="border-radius: 30px;">
